@@ -1,0 +1,14 @@
+* ===========================================================
+* Broadband RLC-ladder model (Foster-I) for GRM188R71C104_100nF_GRAPHFIT
+* Synthesized from vector-fit: 1 branches
+* Impedance equals the vector-fit Z(s) by construction.
+* NOTE: behavioral / estimated model - not measured.
+* ===========================================================
+.subckt GRM188R71C104_100nF_GRAPHFIT 1 2
+Rser 1 n0 2.146469383e-02
+Lser n0 n1 9.074442810e-10
+Cp0 n1 2 1.009879457e-07
+Rp0 n1 2 2.160308528e+06
+L0 n1 m0 1.876595542e-01
+Rs0 m0 2 9.233160942e+00
+.ends GRM188R71C104_100nF_GRAPHFIT

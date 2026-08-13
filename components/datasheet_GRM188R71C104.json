@@ -1,0 +1,12 @@
+{
+  "kind": "capacitor",
+  "part_number": "GRM188R71C104_DATASHEET_GRADE",
+  "capacitance_f": 1.0e-7,
+  "voltage_rating_v": 16,
+  "dielectric": "X7R",
+  "esr_ohm": 0.02,
+  "esr_ref_hz": 2.0e7,
+  "srf_hz": 2.0e7,
+  "source": 5,
+  "notes": "DATASHEET-GRADE. From Murata PDF (JEMCGC-2701X): C=0.1uF, 16V, X7R, DF<=0.035@1kHz, IR>=5GOhm (certain). Datasheet has NO SRF/ESL/impedance graph -> SRF~20MHz and HF-ESR~20mOhm are ENGINEERING ESTIMATES for 0603/100nF class. NOTE: datasheet DF (LF dielectric loss) is NOT used as series ESR (that would give ~56ohm, wrong for SI). ESL back-solved from estimated SRF."
+}

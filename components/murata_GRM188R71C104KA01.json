@@ -1,0 +1,12 @@
+{
+  "kind": "capacitor",
+  "part_number": "Murata_GRM188R71C104KA01_100nF_16V_X7R_0603",
+  "capacitance_f": 1.0e-7,
+  "voltage_rating_v": 16,
+  "dielectric": "X7R",
+  "esr_ohm": 0.015,
+  "esr_ref_hz": 1.6e7,
+  "srf_hz": 1.6e7,
+  "source": 5,
+  "notes": "0603/1608M X7R MLCC. C/V/dielectric from part-number decode (certain). SRF~16MHz and ESR~15mOhm are REPRESENTATIVE class values - verify against Murata SimSurfing/datasheet. ESL back-solved from SRF (physics estimate). For sign-off use SimSurfing measured S-params (level 1)."
+}

@@ -1,0 +1,319 @@
+{
+  "type": "regulator",
+  "type_label": "Regülatör / DC-DC",
+  "part": "TPS61088",
+  "description": "The TPS61088 is a high-power density, fully- integrated synchronous boost converter with a 11-mΩ power switch and a 13-mΩ rectifier switch to provide a high efficiency and small size solution in portable systems. The TPS61088 has a wide input voltage range from 2.7 V to 12 V to support applications with single-cell or two-cell Lithium batteries. The device has 10-A switch current capability and is capable of providing an output voltage up to 12.6 V. The TPS61088 uses adaptive constant off-time peak current control topology to regulate the output voltage. In moderate to heavy load condition, th",
+  "features": [
+    "2.7-V to 12-V input voltage range",
+    "4.5-V to 12.6-V output voltage range",
+    "10-A switch current",
+    "Up to 91% efficiency at VIN = 3.3 V, VOUT = 9 V, and IOUT = 3 A",
+    "Mode selection between PFM mode and forced PWM mode at light load",
+    "1.0-µA current into the VIN pin during shutdown",
+    "Resistor-programmable switch peak current limit",
+    "Adjustable switching frequency: 200 kHz to 2.2 MHz",
+    "Programmable soft start",
+    "Output overvoltage protection at 13.2 V",
+    "Cycle-by-cycle overcurrent protection",
+    "Thermal shutdown",
+    "4.50-mm × 3.50-mm 20-pin VQFN package",
+    "Create a custom design using the TPS61088 with the WEBENCH Power Designer"
+  ],
+  "figures": [
+    "Figure 5-1. 20-Pin VQFN With Thermal Pad RHL Package(Top View)",
+    "Figure 6-1. Efficiency vs Output Current, VOUT = 9",
+    "Figure 6-2. Efficiency vs Output Current, VIN = 3.6",
+    "Figure 6-3. Efficiency vs Output Current, VOUT = 9",
+    "Figure 6-4. Efficiency vs Output Current, VIN = 3.6",
+    "Figure 6-5. Current Limit vs Setting Resistance",
+    "Figure 6-6. Switching Frequency vs Setting",
+    "Figure 6-7. Reference Voltage vs Temperature",
+    "Figure 6-8. Quiescent Current vs Temperature",
+    "Figure 6-9. Shutdown Current vs Temperature",
+    "Figure 7-1. Functional Block Diagram",
+    "Figure 7-2. PFM Mode Diagram",
+    "Figure 8-1. TPS61088 3.3 V to 9-V/3-A Output Converter"
+  ],
+  "pinout": [
+    {
+      "name": "VCC",
+      "number": "1",
+      "io": "O",
+      "desc": "Output of the internal regulator. A ceramic capacitor of more than 1.0 µF is required between this pin and ground."
+    },
+    {
+      "name": "EN",
+      "number": "2",
+      "io": "I",
+      "desc": "Enable logic input. Logic high level enables the device. Logic low level disables the device and turns it into shutdown mode."
+    },
+    {
+      "name": "FSW",
+      "number": "3",
+      "io": "I",
+      "desc": "The switching frequency is programmed by a resistor between this pin and the SW pin."
+    },
+    {
+      "name": "SW",
+      "number": "4, 5, 6, 7",
+      "io": "I",
+      "desc": "The switching node pin of the converter. It is connected to the drain of the internal low-side power MOSFET and the source of the internal high-side power MOSFET."
+    },
+    {
+      "name": "BOOT",
+      "number": "8",
+      "io": "O",
+      "desc": "Power supply for high-side MOSFET gate driver. A ceramic capacitor of 0.1 µF must be connected between this pin and the SW pin."
+    },
+    {
+      "name": "VIN",
+      "number": "9",
+      "io": "I",
+      "desc": "IC power supply input"
+    },
+    {
+      "name": "SS",
+      "number": "10",
+      "io": "O",
+      "desc": "Soft-start programming pin. An external capacitor sets the ramp rate of the reference voltage of the internal error amplifier during soft start."
+    },
+    {
+      "name": "NC",
+      "number": "11, 12",
+      "io": "—",
+      "desc": "No connection inside the device. Connect these two pins to the ground plane on the PCB for good thermal dissipation."
+    },
+    {
+      "name": "MODE",
+      "number": "13",
+      "io": "I",
+      "desc": "Operation mode selection pin for the device in light load condition. When this pin is connected to ground, the device works in PWM mode. When this pin is left floating, the device works in PFM mode."
+    },
+    {
+      "name": "VOUT",
+      "number": "14, 15, 16",
+      "io": "O",
+      "desc": "Boost converter output"
+    },
+    {
+      "name": "FB",
+      "number": "17",
+      "io": "I",
+      "desc": "Voltage feedback. Connect to the center tape of a resistor divider to program the output voltage."
+    },
+    {
+      "name": "COMP",
+      "number": "18",
+      "io": "O",
+      "desc": "Output of the internal error amplifier, the loop compensation network must be connected between this pin and the AGND pin."
+    },
+    {
+      "name": "ILIM",
+      "number": "19",
+      "io": "O",
+      "desc": "Adjustable switch peak current limit. An external resistor must be connected between this pin and the AGND pin."
+    },
+    {
+      "name": "AGND",
+      "number": "20",
+      "io": "—",
+      "desc": "Signal ground of the IC"
+    },
+    {
+      "name": "PGND",
+      "number": "21",
+      "io": "—",
+      "desc": "Power ground of the IC. It is connected to the source of the low-side MOSFET."
+    }
+  ],
+  "specs": [
+    [
+      "Giriş gerilimi (VIN)",
+      "2.7 V – 12 V"
+    ],
+    [
+      "Çıkış gerilimi (VOUT)",
+      "4.5 V – 12.6 V"
+    ],
+    [
+      "Anahtar akım kapasitesi",
+      "10 A"
+    ],
+    [
+      "Anahtarlama frekansı",
+      "200 kHz – 2.2 MHz"
+    ],
+    [
+      "Tepe verim",
+      "%91"
+    ],
+    [
+      "Kapalı-durum akımı (shutdown)",
+      "1.0 µA"
+    ],
+    [
+      "Aşırı gerilim koruma (OVP)",
+      "13.2 V"
+    ],
+    [
+      "Anahtar direnci RDS(on)",
+      "11 mΩ (HS) / 13 mΩ (rectifier)"
+    ],
+    [
+      "Paket",
+      "4.50-mm × 3.50-mm 20-pin VQFN"
+    ],
+    [
+      "Topoloji",
+      "Senkron boost"
+    ]
+  ],
+  "curves": {
+    "current_limit_vs_r": {
+      "caption": "Figure 6-5. Current Limit vs Setting Resistance",
+      "unit_x": "R_SET (kΩ)",
+      "unit_y": "Current Limit (A)",
+      "desc": "Akım limiti vs ayar direnci",
+      "confidence": "high",
+      "npoints": 25
+    },
+    "fsw_vs_r": {
+      "caption": "Figure 6-6. Switching Frequency vs Setting",
+      "unit_x": "R_SET (kΩ)",
+      "unit_y": "fSW (kHz)",
+      "desc": "Anahtarlama frekansı vs ayar direnci",
+      "confidence": "high",
+      "npoints": 6
+    },
+    "vref_vs_temp": {
+      "caption": "Figure 6-7. Reference Voltage vs Temperature",
+      "unit_x": "Sıcaklık (°C)",
+      "unit_y": "Vref (V)",
+      "desc": "Referans gerilimi vs sıcaklık",
+      "confidence": "high",
+      "npoints": 19
+    },
+    "iq_vs_temp": {
+      "caption": "Figure 6-8. Quiescent Current vs Temperature",
+      "unit_x": "Sıcaklık (°C)",
+      "unit_y": "Iq (µA)",
+      "desc": "Sükunet akımı vs sıcaklık",
+      "confidence": "high",
+      "npoints": 35
+    },
+    "ishutdown_vs_temp": {
+      "caption": "Figure 6-9. Shutdown Current vs Temperature",
+      "unit_x": "Sıcaklık (°C)",
+      "unit_y": "I_SD (µA)",
+      "desc": "Kapalı-durum akımı vs sıcaklık",
+      "confidence": "high",
+      "npoints": 10
+    },
+    "_log": [
+      "p7 efficiency: calibration failed: y-axis has no tick labels (found 0)",
+      "p7 efficiency: calibration failed: y-axis has no tick labels (found 0)",
+      "p7 efficiency: calibration failed: y-axis has no tick labels (found 0)",
+      "p7 efficiency: calibration failed: y-axis has no tick labels (found 0)",
+      "p7 current_limit_vs_r: 25 points conf=high (xr2=1.000 yr2=1.000 spread=0.05) Figure 6-5. Current Limit vs Setting Resistance",
+      "p7 fsw_vs_r: 6 points conf=high (xr2=1.000 yr2=1.000 spread=0.00) Figure 6-6. Switching Frequency vs Setting",
+      "p8 vref_vs_temp: 19 points conf=high (xr2=1.000 yr2=1.000 spread=0.06) Figure 6-7. Reference Voltage vs Temperature",
+      "p8 iq_vs_temp: 35 points conf=high (xr2=1.000 yr2=1.000 spread=0.06) Figure 6-8. Quiescent Current vs Temperature",
+      "p8 ishutdown_vs_temp: 10 points conf=high (xr2=1.000 yr2=1.000 spread=0.10) Figure 6-9. Shutdown Current vs Temperature"
+    ]
+  },
+  "design_requirements": [
+    [
+      "Giriş gerilimi aralığı",
+      "3.3 to 4.2 V"
+    ],
+    [
+      "Çıkış gerilimi",
+      "9 V"
+    ],
+    [
+      "Çıkış ripple",
+      "100 mV peak to peak"
+    ],
+    [
+      "Çıkış akımı",
+      "3 A"
+    ],
+    [
+      "Çalışma frekansı",
+      "600 kHz"
+    ],
+    [
+      "Hafif-yük modu",
+      "PFM"
+    ]
+  ],
+  "design_procedure": [
+    {
+      "step": "Anahtarlama frekansı ayarı (RFSW)",
+      "intent": "The switching frequency is set by a resistor connected between the FSW pin and the SW pin of the TPS61088.",
+      "vars": [
+        "RFREQ = the resistance connected between the FSW pin and the SW pin",
+        "CFREQ = 23 pF",
+        "ƒSW = the desired switching frequency",
+        "tDELAY = 89 ns",
+        "VIN = the input voltage",
+        "VOUT = the output voltage"
+      ]
+    },
+    {
+      "step": "Tepe akım limiti ayarı (RILIM)",
+      "intent": "The peak input current is set by selecting the correct external resistor value correlating to the required current limit.",
+      "vars": [
+        "RILIM = the resistance connected between the ILIM pin and ground",
+        "ILIM = the switching peak current limit"
+      ]
+    },
+    {
+      "step": "İndüktör seçimi",
+      "intent": "Three most important specifications to the performance of the inductor are the inductor value, DC resistance, and saturation current.",
+      "vars": []
+    },
+    {
+      "step": "Çıkış kapasitörü seçimi",
+      "intent": "For small output voltage ripple, TI recommends a low-ESR output capacitor like a ceramic capacitor.",
+      "vars": [
+        "Vripple_dis = output voltage ripple caused by charging and discharging of the output capacitor",
+        "Vripple_ESR = output voltage ripple caused by ESR of the output capacitor",
+        "VIN_MIN = the minimum input voltage of boost converter",
+        "VOUT = the output voltage",
+        "IOUT = the output current",
+        "ILpeak = the peak current of the inductor",
+        "ƒSW = the converter switching frequency",
+        "RC_ESR = the ESR of the output capacitors"
+      ]
+    },
+    {
+      "step": "Giriş kapasitörü seçimi",
+      "intent": "For good input voltage filtering, TI recommends low-ESR ceramic capacitors.",
+      "vars": []
+    },
+    {
+      "step": "Geri-besleme / çıkış gerilimi ayarı",
+      "intent": "The output voltage is set by an external resistor divider (R1, R2 in Figure 8-1).",
+      "vars": []
+    }
+  ],
+  "curve_interpretation": [
+    "Akım limiti ayar direnciyle azalıyor (90→349 kΩ, 13.1→3.3 A). Eğriden: R=100kΩ→11.9A, R=250kΩ→4.6A.",
+    "Anahtarlama frekansı ayar direnciyle değişiyor (50→787 kΩ, 216→1916).",
+    "Vref ≈ 1.204 V; -40…125 °C aralığında toplam sapma ~1.7 mV → referans çok kararlı.",
+    "Sükunet akımı Iq 94…119 µA; sıcaklıkla artıyor (-40→84 °C).",
+    "Kapalı-durum akımı 0.36…0.7 µA aralığında."
+  ],
+  "layout_guidelines": [
+    "If layout is not carefully done, the regulator could suffer from instability and noise problems.",
+    "To maximize efficiency, switch rise and fall times are very fast.",
+    "To prevent radiation of high- frequency noise (for example, EMI), proper layout of the high-frequency switching path is essential.",
+    "Minimize the length and area of all traces connected to the SW pin, and always use a ground plane under the switching regulator to minimize interplane coupling.",
+    "The input capacitor needs to be close to the VIN pin and GND pin in order to reduce the Iinput supply ripple.",
+    "The layout should also be done with well consideration of the thermal as this is a high power density device.",
+    "A thermal pad that improves the thermal capabilities of the package should be soldered to the large ground plate, using thermal vias underneath the thermal pad."
+  ],
+  "detect_scores": {},
+  "source_pdf": "C:\\Users\\Excalibur\\Downloads\\tps61088.pdf"
+}

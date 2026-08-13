@@ -1,0 +1,12 @@
+{
+  "kind": "capacitor",
+  "part_number": "GJM1555C1H100_10pF_C0G",
+  "capacitance_f": 1.0e-11,
+  "voltage_rating_v": 50,
+  "dielectric": "C0G/NP0",
+  "esr_ohm": 0.07,
+  "esr_ref_hz": 1.0e9,
+  "srf_hz": 2.4e9,
+  "source": 5,
+  "notes": "Low-loss RF C0G 10pF. ESL back-solved from 2.4 GHz SRF."
+}

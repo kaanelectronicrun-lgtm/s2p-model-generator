@@ -1,0 +1,14 @@
+{
+  "kind": "inductor",
+  "part_number": "LQW18AN10NJ00_10nH",
+  "inductance_h": 1.0e-8,
+  "dcr_ohm": 0.18,
+  "q_factor": 38,
+  "q_ref_hz": 5.0e8,
+  "srf_hz": 3.6e9,
+  "irms_a": 0.7,
+  "isat_a": 1.0,
+  "core_material": "Ferrite (wire-wound)",
+  "source": 5,
+  "notes": "Example 0603 10nH RF inductor. Cp and Rp back-solved from SRF and Q."
+}

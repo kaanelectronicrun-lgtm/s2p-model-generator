@@ -1,0 +1,14 @@
+{
+  "kind": "capacitor",
+  "part_number": "GRM188R71C104_FROM_DATASHEET_GEOMETRY",
+  "capacitance_f": 1.0e-7,
+  "voltage_rating_v": 16,
+  "dielectric": "X7R",
+  "case": "0603",
+  "length_mm": 1.6,
+  "width_mm": 0.8,
+  "esr_ohm": 0.02,
+  "esr_ref_hz": 2.0e7,
+  "source": 5,
+  "notes": "Only datasheet facts: C=0.1uF, 16V, X7R, case 0603 (1.6x0.8mm). NO SRF/ESL given -> tool COMPUTES ESL from case 0603 and then SRF=1/(2*pi*sqrt(LC)). HF-ESR still a class estimate (not in datasheet)."
+}

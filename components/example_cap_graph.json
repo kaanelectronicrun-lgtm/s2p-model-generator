@@ -1,0 +1,13 @@
+{
+  "kind": "capacitor",
+  "part_number": "GRM188R71C104_100nF_GRAPHFIT",
+  "capacitance_f": 1.0e-7,
+  "voltage_rating_v": 16,
+  "dielectric": "X7R",
+  "graphs": {
+    "impedance": "graphs/cap100nF_Z.csv",
+    "esr": "graphs/cap100nF_ESR.csv"
+  },
+  "source": 4,
+  "notes": "Graph-fit demo: |Z| and ESR digitized from datasheet curves; Z(f) is vector-fitted, S-params come from the fit (not the lumped formula)."
+}

@@ -1,0 +1,16 @@
+* ===========================================================
+* Equivalent circuit: INDUCTOR SRP6540_4R7_4u7H_power
+* (DCR + L) series, with Cp and core-loss Rp in parallel across ports
+* L   = 4.700000e-06 H
+* DCR = 2.860000e-02 Ohm
+* Cp  = 1.275603e-12 F
+* Rp  = 2.214823e+03 Ohm  (core loss)
+* SRF = 65.000 MHz
+* NOTE: behavioral / estimated model — not measured.
+* ===========================================================
+.subckt SRP6540_4R7_4u7H_power 1 2
+Rdcr 1 n1 2.860000e-02
+Lind n1 2 4.700000e-06
+Cpar 1 2 1.275603e-12
+Rpar 1 2 2.214823e+03
+.ends SRP6540_4R7_4u7H_power

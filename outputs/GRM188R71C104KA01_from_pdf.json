@@ -1,0 +1,10 @@
+{
+  "kind": "capacitor",
+  "part_number": "GRM188R71C104KA01",
+  "capacitance_f": 1e-07,
+  "voltage_rating_v": 16.0,
+  "dielectric": "X7R",
+  "case": "0603",
+  "source": 5,
+  "notes": "Auto-extracted from datasheet PDF 'GRM188R71C104KA01-01-EN_PDF_CERAMICCAPACITORSMD.pdf'. REVIEW required. SRF/ESR/ESL not in datasheet text -> add an estimate, or keep 'case' for the geometry ESL/SRF calc, or import a measured .s2p. Missing here: none."
+}

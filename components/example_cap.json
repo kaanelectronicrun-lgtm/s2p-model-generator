@@ -1,0 +1,13 @@
+{
+  "kind": "capacitor",
+  "part_number": "GRM188R71C104KA01_100nF",
+  "capacitance_f": 1.0e-7,
+  "voltage_rating_v": 16,
+  "esr_ohm": 0.05,
+  "esr_ref_hz": 1.0e6,
+  "dissipation_factor": 0.025,
+  "srf_hz": 1.6e7,
+  "dielectric": "X7R",
+  "source": 5,
+  "notes": "Example 0603 100nF X7R MLCC. ESL left blank -> back-solved from SRF."
+}

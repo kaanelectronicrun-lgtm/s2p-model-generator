@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+build/
+dist/
+*.spec
+
+# Generated release binaries are published through GitHub Releases.
+releases/
+
+# Local logs and temporary files
+*.log
+*.tmp
+Thumbs.db
+.DS_Store

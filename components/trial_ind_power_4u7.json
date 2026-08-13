@@ -1,0 +1,14 @@
+{
+  "kind": "inductor",
+  "part_number": "SRP6540_4R7_4u7H_power",
+  "inductance_h": 4.7e-6,
+  "dcr_ohm": 0.0286,
+  "srf_hz": 6.5e7,
+  "q_factor": 30,
+  "q_ref_hz": 2.5e6,
+  "irms_a": 6.5,
+  "isat_a": 9.0,
+  "core_material": "Ferrite (shielded power)",
+  "source": 5,
+  "notes": "Shielded power inductor. Cp and Rp from SRF and Q."
+}
