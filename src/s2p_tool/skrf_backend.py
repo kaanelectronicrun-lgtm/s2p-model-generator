@@ -56,7 +56,10 @@ def fit_passive_spice(freq: np.ndarray, z: np.ndarray, z0: float,
     Returns a dict with the engine, passivity status, and the model's series Z(f)
     on the input grid (for accuracy comparison).
     """
-    from skrf import VectorFitting
+    try:                                        # skrf < 2.x exposed it top-level
+        from skrf import VectorFitting
+    except ImportError:                          # skrf >= 2.x: submodule only
+        from skrf.vectorFitting import VectorFitting
 
     ntwk = _network_from_series_z(freq, z, z0)
     ref = np.sqrt(np.mean(np.abs(z) ** 2)) + 1e-30

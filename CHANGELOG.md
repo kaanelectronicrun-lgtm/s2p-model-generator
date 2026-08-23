@@ -1,5 +1,27 @@
 # Değişiklik Günlüğü
 
+## v1.2.0 — Bölüm motoru + komponent aileleri + OCR eğri (2026-08-23)
+
+Datasheet analizi monolitik akıştan **bağımsız-Section** motoruna taşındı ve iki
+yeni komponent ailesi (diyot, direnç) gerçek TI & Samsung datasheet'leriyle
+doğrulandı.
+
+- **Section motoru** (`analysis/`): her başlık kendi güven skorlu birimi
+  (Pinout/Spec/Curves/Design/Layout); pdfplumber ruled-line tablo + TI
+  word-geometry override; footer/thermal-satır filtresi.
+- **Komponent aileleri:** op-amp **alt-tür** (JFET/zero-drift/rail-to-rail/…),
+  **diyot** (Schottky/Zener/TVS + VF/VZ/VC/VRRM/VBR/IPP/Cj) ve **direnç**
+  (thick/thin-film/shunt + chip-resistor part-no çözücü: boyut/güç/tolerans).
+- **Çıkarım düzeltmeleri:** dosya-adı-öncelikli part-no (opa2340→ADS7816 fix,
+  lm336-2.5 varyant-sonek), Iq eğri birimi µA (eksen-başlığından okuma),
+  pinout I/O eşleme + subscript rejoin, spec footer temizliği.
+- **Eğri motoru:** vertical-band frame bulucu (yan-border+tek-kenar plotlar),
+  dB-fragment + eksen-birim tutarlılık geçitleri, ve **OCR raster fallback**
+  robust kalibrasyonu (outlier-trim) — TVS Cj-VR gibi outline/raster plotlar
+  yüksek-güvenle çıkıyor.
+- **Güven özeti** komponent-türüne duyarlı + gerçek çıkarımla uzlaşık.
+- Çeviri: EE terim sözlüğü + tekrar-kelime birleştirme; TR/EN i18n.
+
 ## Yayınlanmamış — Regülatör eğri çıkarımı sağlamlığı (2026-08-07)
 
 `pdfcurves` çerçeve/tick tespiti yeniden yazıldı; kalibre olamayan gerçek eğriler
