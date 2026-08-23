@@ -109,13 +109,21 @@ def _relabel_unit(label: str, detected: Optional[str]) -> str:
 
 
 def _description(text: str) -> str:
-    """The prose paragraph under a 'Description' heading, if present."""
+    """The prose paragraph under a 'Description' heading, if present. Rejects a
+    packaging/spec *table* that happens to sit under the heading (common on
+    passive-family sheets), which is number-heavy jargon, not prose."""
     m = re.search(r"\bDescription\b\s*(.+?)(?:\n\s*\n|\Z)", text,
                   re.S | re.I)
     if not m:
         return ""
-    para = re.sub(r"\s+", " ", m.group(1)).strip()
-    return para[:600]
+    para = re.sub(r"\s+", " ", m.group(1)).strip()[:600]
+    words = para.split()
+    if words:
+        numish = sum(1 for w in words if re.search(r"\d", w)) / len(words)
+        pkg = len(re.findall(r"\b(?:PCS|REEL|BULK|PACKAGING)\b", para, re.I))
+        if numish > 0.35 or pkg >= 3:
+            return ""
+    return para
 
 
 def _features(text: str) -> List[str]:
