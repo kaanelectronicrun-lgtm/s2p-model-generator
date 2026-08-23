@@ -51,7 +51,10 @@ def _part_number(doc, pdf_path: Optional[str] = None) -> str:
     first-page text (guards against stray title metadata)."""
     def _partlike(tok: str) -> bool:
         # 2+ leading letters, then a digit somewhere — a real MPN, not a word.
-        return bool(re.fullmatch(r"[A-Za-z]{2,}[\w-]*\d[\w-]*", tok or ""))
+        # '.' is allowed so a voltage-variant suffix survives (lm336-2.5 →
+        # LM336-2.5) instead of the filename being rejected and a wrong family
+        # sibling picked from the heading text.
+        return bool(re.fullmatch(r"[A-Za-z]{2,}[\w.\-]*\d[\w.\-]*", tok or ""))
 
     if pdf_path:
         stem = os.path.splitext(os.path.basename(pdf_path))[0].strip()

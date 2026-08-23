@@ -110,7 +110,7 @@ class AnalysisContext:
         stem = os.path.splitext(os.path.basename(self.pdf_path))[0].strip()
         stem = re.sub(r"[\s_\-]*(datasheet|ds|rev[a-z]?|final)$", "", stem,
                       flags=re.I).strip()
-        if re.fullmatch(r"[A-Za-z]{2,}[\w-]*\d[\w-]*", stem or ""):
+        if re.fullmatch(r"[A-Za-z]{2,}[\w.\-]*\d[\w.\-]*", stem or ""):
             return stem.upper()
         page0 = self.doc[0].get_text()
         title = (self.doc.metadata or {}).get("title") or ""
