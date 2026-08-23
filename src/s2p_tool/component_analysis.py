@@ -845,9 +845,41 @@ def _enrich_with_sections(result: Dict, pdf_path: str) -> None:
         return
     result["vendor"] = sec.get("vendor")
     sections = sec.get("sections", {})
-    result["section_confidence"] = {
-        k: {"confidence": v.get("confidence"), "reason": v.get("reason")}
-        for k, v in sections.items()}
+    conf = {k: {"confidence": v.get("confidence"), "reason": v.get("reason")}
+            for k, v in sections.items()}
+
+    # The per-section engine is regulator/op-amp-centric: it reads pin/spec
+    # tables and vector curves, so it misses a resistor's part-number-decoded
+    # specs and a diode's raster-OCR curves. Reconcile the summary with what the
+    # family analyzer actually produced so it doesn't say "yok" next to a
+    # populated report.
+    legacy_specs = result.get("specs") or []
+    if legacy_specs and conf.get("specs", {}).get("confidence") in (
+            None, "none", "low"):
+        conf["specs"] = {"confidence": "med",
+                         "reason": f"{len(legacy_specs)} öne çıkan parametre "
+                                   f"(part-no/regex)"}
+    hi_curves = [k for k, c in (result.get("curves") or {}).items()
+                 if isinstance(c, dict) and c.get("confidence") == "high"]
+    if hi_curves and conf.get("curves", {}).get("confidence") in (
+            None, "none", "low"):
+        conf["curves"] = {"confidence": "high",
+                          "reason": f"{len(hi_curves)} eğri yüksek (OCR/vektör)"}
+
+    # Show only the sections that mean something for this family. A passive
+    # resistor has no pinout/curves/design; a discrete diode has no design
+    # procedure. Optional sections that came back empty are dropped so the
+    # summary reads as relevant, not a wall of "yok". (specs is always shown.)
+    _RELEVANT = {"diode": ("specs", "curves", "pinout", "layout"),
+                 "resistor": ("specs",)}
+    relevant = _RELEVANT.get(result.get("type"))
+    if relevant is None:                          # regulator/op-amp: full set
+        result["section_confidence"] = conf
+    else:
+        result["section_confidence"] = {
+            k: conf[k] for k in relevant if k in conf
+            and not (k != "specs" and conf[k].get("confidence") in (None, "none"))
+        }
     specs_sec = sections.get("specs", {})
     if specs_sec.get("data"):
         result["spec_table"] = specs_sec["data"]
