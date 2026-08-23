@@ -15,3 +15,12 @@ releases/
 *.tmp
 Thumbs.db
 .DS_Store
+
+# Downloaded vendor datasheets (copyrighted) and local probe artifacts
+ti_test/
+ti_opamp/
+ti_diode/
+samsung_resistor/
+ti_resistor/
+.vscode/
+**/_dbg_*.png
