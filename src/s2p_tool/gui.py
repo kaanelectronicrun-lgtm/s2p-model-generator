@@ -98,18 +98,19 @@ class AnalysisWorker(QThread):
     progress = pyqtSignal(str)
     finished = pyqtSignal(bool, object)  # ok, result dict (or error string)
 
-    def __init__(self, pdf, type_hint, out_dir):
+    def __init__(self, pdf, type_hint, out_dir, lang="tr"):
         super().__init__()
         self.pdf = pdf
         self.type_hint = type_hint
         self.out_dir = out_dir
+        self.lang = lang
 
     def run(self):
         try:
             from .component_analysis import analyze_pdf
             self.progress.emit(f"Datasheet okunuyor: {Path(self.pdf).name}")
             self.progress.emit("Tür tespiti + spec + vektör eğri çıkarımı...")
-            res = analyze_pdf(self.pdf, self.type_hint, self.out_dir)
+            res = analyze_pdf(self.pdf, self.type_hint, self.out_dir, self.lang)
             self.finished.emit(True, res)
         except Exception as e:
             self.finished.emit(False, f"Hata: {str(e)}")
@@ -796,6 +797,16 @@ class S2PGui(QMainWindow):
         xl_row.addWidget(xb)
         lay.addLayout(xl_row)
 
+        lang_row = QHBoxLayout()
+        lang_row.addWidget(QLabel("Rapor dili:"))
+        w["lang"] = QComboBox()
+        w["lang"].addItem("Türkçe (otomatik çeviri)", "tr")
+        w["lang"].addItem("İngilizce (orijinal, çevirisiz)", "en")
+        lang_row.addWidget(w["lang"])
+        lang_row.addWidget(QLabel(self._translate_backend_hint()))
+        lang_row.addStretch()
+        lay.addLayout(lang_row)
+
         w["btn"] = QPushButton(f"Analiz Et ({label})")
         w["btn"].setStyleSheet("QPushButton { font-size:14px; padding:10px; "
                                "background-color:#3F51B5; color:white; }")
@@ -811,6 +822,19 @@ class S2PGui(QMainWindow):
         panel.setLayout(lay)
         return panel
 
+    @staticmethod
+    def _translate_backend_hint():
+        """One-line status of the available translation backend for the UI."""
+        try:
+            from .analysis import translate as _tr
+            if _tr.argos_available("en", "tr"):
+                return "çeviri: offline (argos) ✓"
+            if _tr.deepl_available():
+                return "çeviri: DeepL ✓"
+            return "çeviri: yok — İngilizce kalır"
+        except Exception:
+            return ""
+
     def start_analysis(self, hint):
         w = self._an_widgets[hint]
         pdf = w["pdf"].text().strip()
@@ -819,7 +843,8 @@ class S2PGui(QMainWindow):
             return
         w["btn"].setEnabled(False)
         w["result"].clear()
-        worker = AnalysisWorker(pdf, hint, w["out"].text())
+        lang = w["lang"].currentData() if "lang" in w else "tr"
+        worker = AnalysisWorker(pdf, hint, w["out"].text(), lang)
         worker.progress.connect(lambda m, e=w["result"]: e.append(m))
         worker.finished.connect(
             lambda ok, res, h=hint: self.on_analysis_done(h, ok, res))
@@ -873,6 +898,17 @@ class S2PGui(QMainWindow):
         L = []
         L.append(f"KOMPONENT: {res.get('part', '?')}")
         L.append(f"TÜR: {res.get('type_label', res.get('type'))}")
+        if res.get("subtype") and res.get("subtype") != "general":
+            L.append(f"ALT TÜR: {res.get('subtype_label')}")
+        ven = res.get("vendor")
+        if ven and ven.get("key") != "generic":
+            L.append(f"ÜRETİCİ: {ven.get('label')} (skor {ven.get('score')})")
+        sc = res.get("section_confidence")
+        if sc:
+            badge = {"high": "✅", "med": "🟡", "low": "⚠️", "none": "—"}
+            parts = [f"{k}:{badge.get(v.get('confidence'), '?')}"
+                     for k, v in sc.items()]
+            L.append("BÖLÜM GÜVENİ: " + "  ".join(parts))
         if res.get("detect_scores"):
             L.append(f"  (tespit skorları: {res['detect_scores']})")
         if res.get("error"):
