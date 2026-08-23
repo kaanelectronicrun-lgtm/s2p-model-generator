@@ -280,6 +280,51 @@ def _sig(v: float, n: int = 6) -> float:
     return round(v, d)
 
 
+_SI_PREFIX_PC = "pnuµμmkKMGT"
+
+
+def _unit_base_pc(u: str) -> str:
+    u = (u or "").strip().replace("u", "µ").replace("μ", "µ")
+    if not u or "/" in u:
+        return u
+    m = re.fullmatch(r"[" + _SI_PREFIX_PC + r"µ]?(.+)", u)
+    return m.group(1) if m else u
+
+
+def axis_dim_mismatch(expected_label: str, detected_unit: str) -> bool:
+    """True when the datasheet's detected x/y unit disagrees in *dimension* with
+    what a curve target expects. A target like fsw-vs-'R_SET (kΩ)' must not claim
+    a 'Switching Frequency vs Junction Temperature' plot (x is °C, not Ω): same
+    caption words, different axis. Only fires when a unit was actually detected;
+    an undetected axis is left to the existing behaviour."""
+    if not detected_unit:
+        return False
+    m = re.search(r"\(([^()]*)\)", expected_label or "")
+    if not m:
+        return False
+    exp = _unit_base_pc(m.group(1))
+    # Only guard the axes that actually get misfired onto — a resistor (Ω) or
+    # temperature (°C) x-axis target catching a different plot. Frequency (Hz)
+    # dB-curve targets have distinctive captions that never collide, and their
+    # axis-unit detection is noisier, so gating them would wrongly drop a good
+    # curve; leave those to the dB-plausibility gate.
+    if exp not in ("Ω", "°C"):
+        return False
+    return exp != _unit_base_pc(detected_unit)
+
+
+def db_fragment(unit_label: str, curve) -> bool:
+    """A gain/CMRR/PSRR trace that spans only a few dB is a digitization
+    fragment, not the real roll-off. Given a curve's unit label (which the
+    caller knows from the target, e.g. 'PSRR (dB)') and its points, report
+    whether the dB span is implausibly small (<10 dB). Used to demote a curve
+    that calibrated cleanly yet captured too little of the axis."""
+    if "dB" not in (unit_label or ""):
+        return False
+    ys = [p[1] for p in (curve or [])]
+    return bool(ys) and (max(ys) - min(ys)) < 10.0
+
+
 def extract_curves(pdf_path: str, max_pages: int = 12) -> Dict:
     """Extract every known target curve from a datasheet PDF.
 
@@ -324,18 +369,25 @@ _FIGCAP = re.compile(r"^\s*(?:Figure|Fig\.?)\s+[\dA-Za-z\-]+", re.I)
 
 
 def _frame_above_caption(segs, cx, cap_y, col_x0, col_x1, max_h=275.0):
-    """Inner axes rectangle of the plot sitting just above a caption.
+    """Inner axes rectangle of the plot just above a caption.
 
-    TI 'Typical Characteristics' pages stack subplots in a loose grid; the old
-    bounding-box approach fused a plot with its neighbour (and with page-wide
-    separator rules). Instead we lock onto the actual axes box: the plot border
-    and its internal gridlines all share one horizontal extent, so we cluster
-    horizontals by (x0, x1) extent, split each extent into vertical runs (a gap
-    marks a different stacked plot), and keep the (extent, run) box whose bottom
-    edge sits just above THIS caption. ``cx``/``cap_y`` are the caption centre-x
-    and top-y; ``col_x0``/``col_x1`` bound a caption-centred window so a
-    neighbouring subplot cannot bleed in. Returns (x0, y0, x1, y1) or None.
+    Two complementary strategies (a plot only needs to satisfy one):
+      * ``_frame_hband`` — horizontal-first: cluster the top/bottom/gridline
+        horizontals by x-extent, split into stacked plots by their vertical
+        edges. Strong on TI 'Typical Characteristics' grids.
+      * ``_frame_vband`` — vertical-first: cluster the side borders / y-axis
+        into y-bands (one per plot), then let the horizontals inside a band fix
+        its width. Rescues plots that draw side borders + a single horizontal
+        edge but no full box (e.g. TI TVS 'Pin Capacitance vs V').
+    The horizontal-first path runs first so every currently-working plot is
+    unchanged; the vertical-first path is a pure add-on for the ones it missed.
     """
+    return (_frame_hband(segs, cx, cap_y, col_x0, col_x1, max_h)
+            or _frame_vband(segs, cx, cap_y, col_x0, col_x1, max_h))
+
+
+def _frame_hband(segs, cx, cap_y, col_x0, col_x1, max_h=275.0):
+    """Horizontal-first axes-box finder (see ``_frame_above_caption``)."""
     top_lim = cap_y - max_h
     H, V = [], []
     for (ax, ay, bx, by) in segs:
@@ -382,9 +434,35 @@ def _frame_above_caption(segs, cx, cap_y, col_x0, col_x1, max_h=275.0):
         for (a, b, _c) in spans:
             if (b - a) <= 30:
                 continue
-            # confirm a top horizontal near a and a bottom near b at this extent
-            if any(abs(y - a) <= 6 for y in ys) and any(abs(y - b) <= 6 for y in ys):
+            top = any(abs(y - a) <= 6 for y in ys)
+            bot = any(abs(y - b) <= 6 for y in ys)
+            # A full box has top AND bottom horizontal borders. But many plots
+            # (e.g. TI TVS "Pin Capacitance vs V") draw left+right vertical
+            # borders and only ONE horizontal edge; accept those too when both
+            # vertical edges are present (_c >= 2), since two verticals + one
+            # horizontal already pin a real axes rectangle.
+            if (top and bot) or ((top or bot) and _c >= 2):
                 boxes.append((xlo, xhi, a, b))
+    # Fallback for axis-only plots: TI 'Typical Characteristics' often draw an
+    # L-shaped axis + interior gridlines but no top/bottom border, so no H edge
+    # confirms the V-defined box above. When the H-confirmed pass finds nothing,
+    # accept a box delimited by a cluster of interior VERTICAL gridlines (>=3
+    # sharing a [ylo,yhi] span, spanning a real width) — the vertical grid alone
+    # pins the plot's extent. Kept as a fallback so working plots are unaffected.
+    if not boxes and V:
+        vspans = []  # [ylo, yhi, xs]
+        for (vx, vylo, vyhi) in V:
+            if (vyhi - vylo) <= 30:
+                continue
+            for s in vspans:
+                if abs(s[0] - vylo) <= 8 and abs(s[1] - vyhi) <= 8:
+                    s[2].append(vx)
+                    break
+            else:
+                vspans.append([vylo, vyhi, [vx]])
+        for ylo, yhi, xs in vspans:
+            if len(xs) >= 3 and (max(xs) - min(xs)) >= 60:
+                boxes.append((min(xs), max(xs), ylo, yhi))
     boxes = [b for b in boxes if b[3] <= cap_y + 2]
     if not boxes:
         return None
@@ -395,6 +473,62 @@ def _frame_above_caption(segs, cx, cap_y, col_x0, col_x1, max_h=275.0):
     if (x1 - x0) < 30 or (y1 - y0) < 30:
         return None
     return (x0, y0, x1, y1)
+
+
+def _frame_vband(segs, cx, cap_y, col_x0, col_x1, max_h=275.0):
+    """Vertical-first axes-box finder (see ``_frame_above_caption``).
+
+    Groups long vertical segments (left/right borders, y-axis, gridlines) into
+    y-bands — one per stacked plot — then lets the horizontals lying inside a
+    band fix its x-width. A plot with side borders + one horizontal edge (top OR
+    bottom) is recovered here even though the horizontal-first pass, which wants
+    a confirmed top-and-bottom, gives up. A slightly larger bottom tolerance is
+    safe because this runs only when the horizontal-first path already failed
+    (so grid pages, which it handles, never reach here)."""
+    top_lim = cap_y - max_h
+    H, V = [], []
+    for (ax, ay, bx, by) in segs:
+        xlo, xhi = min(ax, bx), max(ax, bx)
+        ylo, yhi = min(ay, by), max(ay, by)
+        if abs(ay - by) < 1.5 and (xhi - xlo) > 40:
+            if col_x0 - 2 <= xlo and xhi <= col_x1 + 2 \
+               and top_lim <= (ay + by) / 2 <= cap_y + 15:
+                H.append((xlo, xhi, (ay + by) / 2))
+        elif abs(ax - bx) < 1.5 and (yhi - ylo) > 30:
+            if col_x0 - 2 <= (ax + bx) / 2 <= col_x1 + 2 \
+               and top_lim - 6 <= ylo and yhi <= cap_y + 15:
+                V.append(((ax + bx) / 2, ylo, yhi))
+    if not V or not H:
+        return None
+    # Cluster verticals into y-bands (tallest first anchors each band).
+    bands = []  # [ylo, yhi, xs]
+    for (vx, vylo, vyhi) in sorted(V, key=lambda z: -(z[2] - z[1])):
+        for bd in bands:
+            if abs(bd[0] - vylo) <= 10 and abs(bd[1] - vyhi) <= 10:
+                bd[2].append(vx)
+                break
+        else:
+            bands.append([vylo, vyhi, [vx]])
+    boxes = []  # (x0, y0, x1, y1)
+    for ylo, yhi, xs in bands:
+        if (yhi - ylo) <= 30:
+            continue
+        hin = [(h0, h1) for (h0, h1, hy) in H if ylo - 6 <= hy <= yhi + 6]
+        if not hin:                          # a band with no horizontal isn't a plot
+            continue
+        x0 = min(min(h[0] for h in hin), min(xs))
+        x1 = max(max(h[1] for h in hin), max(xs))
+        if (x1 - x0) > 60:
+            boxes.append((x0, ylo, x1, yhi))
+    boxes = [b for b in boxes if b[3] <= cap_y + 15]
+    if not boxes:
+        return None
+    x0, y0, x1, y1 = min(
+        boxes, key=lambda b: (abs(b[3] - cap_y), abs((b[0] + b[2]) / 2 - cx)))
+    if (x1 - x0) < 30 or (y1 - y0) < 30:
+        return None
+    return (x0, y0, x1, y1)
+
 
 def _calibrate_q(ticks: List[Tuple[float, float]]):
     """Like _calibrate but also returns fit quality: (fn, r2, n_ticks)."""
@@ -477,6 +611,58 @@ def _axis_ticks(spans, frame):
     else:
         yt = []
     return xt, yt
+
+
+# A physical unit as it appears in a datasheet axis title. Order matters:
+# compound units (nV/√Hz, V/µs) are tried before their bare bases (V) so the
+# base doesn't shadow them. Prefix letters (µ/m/n/p/k/M/G) are captured so a
+# quiescent-current plot reads "µA", not the hardcoded "mA".
+_UNIT_TOK = re.compile(
+    r"(nV\s*/\s*√?\s*Hz|V\s*/\s*[µμu]s|[pnuµμm]?A|[kMG]?Hz|[pnuµμm]?V|"
+    r"[pnuµμm]?s|dB|°C|[pnuµμm]?[ΩΩΩ]|%)",
+    re.I)
+
+
+def _unit_from_label(text: str) -> Optional[str]:
+    """Pull the unit out of an axis title. TI writes them as ``(µA)`` or
+    ``IQ − Quiescent Current − µA``; onsemi/ADI use parentheses. Returns the
+    normalized unit string (µ preferred over u) or None. Only trusts a unit in
+    parentheses or as a trailing dash-delimited token so a stray letter mid-word
+    can't masquerade as a unit."""
+    cands = re.findall(r"\(([^()]{1,10})\)", text)          # (µA)
+    tail = re.split(r"[-–—]", text)
+    if tail:
+        cands.append(tail[-1].strip())                       # ... − µA
+    for c in cands:
+        m = _UNIT_TOK.fullmatch(c.strip())
+        if m:
+            return m.group(1).replace("u", "µ").replace("μ", "µ")
+    return None
+
+
+def _axis_unit(spans, frame) -> Tuple[Optional[str], Optional[str]]:
+    """Best-effort (x_unit, y_unit) from the axis-title spans around a plot
+    frame. The y-title sits just left of the y-ticks (often rotated, still
+    readable); the x-title sits just below the x-ticks. Datasheet pages pack
+    several plots side by side, so a neighbour's title also lands left of this
+    frame — pick the unit-bearing span *nearest the frame edge* (max cx on the
+    left, min cy below), not merely the first one seen. Non-numeric spans only,
+    so tick numbers are never mistaken for a unit. (None, None) when none parse."""
+    fx0, fy0, fx1, fy1 = frame
+    fw = fx1 - fx0
+    y_cands, x_cands = [], []            # (distance_key, unit)
+    for (t, sx0, sy0, sx1, sy1) in spans:
+        u = _unit_from_label(t)
+        if u is None:
+            continue
+        cx, cy = (sx0 + sx1) / 2, (sy0 + sy1) / 2
+        if cx < fx0 and (fy0 - 2) <= cy <= (fy1 + 2):
+            y_cands.append((cx, u))                  # nearer the frame = larger cx
+        elif cy > fy1 and (fx0 - 0.2 * fw) <= cx <= (fx1 + 0.2 * fw):
+            x_cands.append((cy, u))                  # nearer the frame = smaller cy
+    yu = max(y_cands)[1] if y_cands else None
+    xu = min(x_cands)[1] if x_cands else None
+    return xu, yu
 
 
 def _multitrace_spread(curve):
@@ -635,7 +821,8 @@ def _digitize_frame(spans, segs, frame, color_segs=None):
     xt, yt = _axis_ticks(spans, frame)
     xcal, xr2, nx = _calibrate_q(xt)
     ycal, yr2, ny = _calibrate_q(yt)
-    meta.update(xr2=xr2, yr2=yr2, nx=nx, ny=ny)
+    xu, yu = _axis_unit(spans, frame)
+    meta.update(xr2=xr2, yr2=yr2, nx=nx, ny=ny, ux=xu, uy=yu)
     if not xcal or not ycal:
         # Name the axis that yielded no usable ticks — on TI plots this is
         # typically an axis whose numbers are drawn as vectors, not text.
@@ -718,6 +905,16 @@ def extract_labeled_curves(pdf_path: str, wanted, max_pages: int = 16) -> Dict:
                 good = (meta["xr2"] >= 0.985 and meta["yr2"] >= 0.985
                         and meta["nx"] >= 3 and meta["ny"] >= 3
                         and (meta["spread"] < 0.25 or bool(traces)))
+                # Plausibility gate: a dB characteristic (gain/CMRR/PSRR) rolls
+                # off tens of dB across its axis. If the digitized trace spans
+                # only a few dB, we captured a fragment, not the curve — clean
+                # axis calibration alone must not brand that "high". (Non-dB
+                # axes like Iq/µA legitimately span a small numeric range, so
+                # the gate keys on the detected unit.)
+                if good and "dB" in (meta.get("uy") or ""):
+                    ys = [p[1] for p in curve]
+                    if ys and (max(ys) - min(ys)) < 10.0:
+                        good = False
                 conf = "high" if good else "low"
                 # Prefer high confidence; then more traces; then more points.
                 prev = out.get(key)
