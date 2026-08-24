@@ -25,3 +25,4 @@ ti_resistor/
 .vscode/
 **/_dbg_*.png
 scripts/shot_*.py
+.buildvenv/

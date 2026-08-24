@@ -94,6 +94,18 @@ def main():
         "--hidden-import=PyQt5.QtCore",
         "--hidden-import=PyQt5.QtGui",
         "--hidden-import=PyQt5.QtWidgets",
+        "--exclude-module=PyQt6",              # only one Qt binding may be frozen
+        "--exclude-module=PySide6",            # (env has extra bindings installed)
+        "--exclude-module=PySide2",
+        # Heavy packages present in the dev env but NOT s2p dependencies — keep
+        # the exe lean (torch alone is ~500 MB). cv2/pytesseract only feed the
+        # optional raster-OCR path, which needs an external Tesseract binary
+        # anyway, so excluding them costs nothing in the frozen app.
+        "--exclude-module=torch",
+        "--exclude-module=cv2",
+        "--exclude-module=pytesseract",
+        "--exclude-module=pandas",
+        "--collect-all=pdfplumber",            # spec/pinout ruled-line tables
         "gui_main.py"                          # Entry point
     ]
     
