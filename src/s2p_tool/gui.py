@@ -587,7 +587,7 @@ class S2PGui(QMainWindow):
         info_text.setReadOnly(True)
         info_text.setHtml("""
         <h3>Ayarlar ve Bilgi</h3>
-        <p><b>ChipLens v1.2.0</b></p>
+        <p><b>ChipLens v1.3.0</b></p>
         <p>Datasheet komponent analizi (op-amp · regülatör · diyot · direnç) +
         kapasitör/indüktör SPICE model üretimi.</p>
         

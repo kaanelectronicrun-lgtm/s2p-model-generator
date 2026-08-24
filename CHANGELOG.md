@@ -1,5 +1,17 @@
 # Değişiklik Günlüğü
 
+## v1.3.0 — ChipLens rebrand + kırmızı/beyaz logo (2026-08-24)
+
+Ürün "S2P" (bir dosya tipi) isminden **ChipLens**'e taşındı — artık SPICE model
+üretiminin yanında komponent datasheet analizi (op-amp/regülatör/diyot/direnç)
+yapıyor.
+
+- Yeni **ChipLens** adı: pencere başlığı, ikon, Hakkında/Yardım, exe + installer.
+- Modern **kırmızı/beyaz logo** (squircle + S-parametre dalga formu + wordmark);
+  çok-boyutlu `.ico` exe/pencere ikonuna gömülü (`scripts/make_logo.py`).
+- Build: `chiplens-<ver>-win64.exe` + `chiplens-setup-<ver>.exe`.
+- Temiz-venv build akışı (kirli global Python'daki torch/çoklu-Qt hang'ini önler).
+
 ## v1.2.0 — Bölüm motoru + komponent aileleri + OCR eğri (2026-08-23)
 
 Datasheet analizi monolitik akıştan **bağımsız-Section** motoruna taşındı ve iki
