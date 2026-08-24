@@ -141,6 +141,10 @@ class S2PGui(QMainWindow):
         ico = _asset("chiplens.ico")
         if ico:
             self.setWindowIcon(QIcon(ico))
+        # subtle attribution, bottom-right of the status bar
+        credit = QLabel("by Kaan AKCAN   ")
+        credit.setStyleSheet("color:#9AA0A6; font-size:11px;")
+        self.statusBar().addPermanentWidget(credit)
         self.resize(1000, 700)
         self.show()
     
