@@ -5,7 +5,7 @@
 
 Reads the version from src/s2p_tool/__init__.py, finds the matching
 releases/s2p-<version>-win64.exe (build it first with build_exe.py), generates
-an Inno Setup script and compiles it to releases/s2p-setup-<version>.exe.
+an Inno Setup script and compiles it to releases/chiplens-setup-<version>.exe.
 
 The installer is a single distributable file. It installs per-user (no admin
 prompt), creates Start-Menu and optional desktop shortcuts, registers a proper
@@ -103,7 +103,7 @@ Filename: "{{app}}\\ChipLens.exe"; Description: "ChipLens'i çalıştır"; Flags
         print(f"✗ ISCC {r.returncode} ile başarısız")
         sys.exit(1)
 
-    out = releases / f"s2p-setup-{version}.exe"
+    out = releases / f"chiplens-setup-{version}.exe"
     iss.unlink(missing_ok=True)
     if out.is_file():
         print(f"\n✓ SUCCESS: {out}  ({out.stat().st_size/1048576:.1f} MB)")
