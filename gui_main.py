@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""GUI launcher for S2P Tool.
+"""GUI launcher for ChipLens.
 
     python gui_main.py
 """

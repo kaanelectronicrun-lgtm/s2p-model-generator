@@ -60,7 +60,7 @@ def main():
     releases_dir = Path("releases")
     releases_dir.mkdir(exist_ok=True)
     
-    exe_name = f"s2p-{version}-win64"
+    exe_name = f"chiplens-{version}-win64"
     exe_path = releases_dir / f"{exe_name}.exe"
     
     # Check if PyInstaller is installed
@@ -79,6 +79,8 @@ def main():
         "--onefile",                           # Single exe file
         "--windowed",                          # No console window
         "--name", exe_name,                    # Output exe name
+        "--icon", "assets/chiplens.ico",       # taskbar / exe icon
+        "--add-data", "assets/chiplens.ico;assets",  # window icon at runtime
         "--distpath", str(releases_dir),       # Output directory
         "--workpath", "build",                 # Build directory
         "--specpath", ".",                     # Spec file location

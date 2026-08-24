@@ -1,4 +1,4 @@
-"""PyQt5 GUI for s2p tool - Capacitor/Inductor SPICE Model Generator."""
+"""PyQt5 GUI for ChipLens — datasheet component analysis + SPICE model generator."""
 
 import sys
 import os
@@ -116,15 +116,31 @@ class AnalysisWorker(QThread):
             self.finished.emit(False, f"Hata: {str(e)}")
 
 
+def _asset(name):
+    """Absolute path to a bundled asset — works from source and the frozen exe
+    (PyInstaller unpacks --add-data into sys._MEIPASS)."""
+    base = getattr(sys, "_MEIPASS", None)
+    if base:
+        p = os.path.join(base, "assets", name)
+    else:                                   # src/s2p_tool/gui.py -> repo root
+        root = os.path.dirname(os.path.dirname(os.path.dirname(
+            os.path.abspath(__file__))))
+        p = os.path.join(root, "assets", name)
+    return p if os.path.exists(p) else None
+
+
 class S2PGui(QMainWindow):
-    """Main GUI window for s2p tool."""
-    
+    """Main GUI window for ChipLens."""
+
     def __init__(self):
         super().__init__()
         self.input_files = []
         self.worker = None
         self.init_ui()
-        self.setWindowTitle("S2P Tool - SPICE Model Generator")
+        self.setWindowTitle("ChipLens — Datasheet Analiz & SPICE Model")
+        ico = _asset("chiplens.ico")
+        if ico:
+            self.setWindowIcon(QIcon(ico))
         self.resize(1000, 700)
         self.show()
     
@@ -571,8 +587,9 @@ class S2PGui(QMainWindow):
         info_text.setReadOnly(True)
         info_text.setHtml("""
         <h3>Ayarlar ve Bilgi</h3>
-        <p><b>S2P Tool v1.0.0</b></p>
-        <p>Kapasitor ve Inductor datasheet parametrelerini SPICE modeline dönüştürür.</p>
+        <p><b>ChipLens v1.2.0</b></p>
+        <p>Datasheet komponent analizi (op-amp · regülatör · diyot · direnç) +
+        kapasitör/indüktör SPICE model üretimi.</p>
         
         <h4>Çıktı Dosyaları:</h4>
         <ul>
@@ -987,7 +1004,7 @@ class S2PGui(QMainWindow):
         help_text = QTextEdit()
         help_text.setReadOnly(True)
         help_text.setHtml("""
-        <h3>S2P Tool Kullanım Kılavuzu</h3>
+        <h3>ChipLens Kullanım Kılavuzu</h3>
         
         <h4>1. Model Oluşturma (Model Üret Sekmesi)</h4>
         <ol>
