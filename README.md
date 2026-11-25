@@ -151,3 +151,15 @@ s2p/
     └── cli.py              # argparse entry point
 tests/test_vectorfit.py     # fitter self-tests (no pytest needed)
 ```
+
+## License and usage restrictions
+
+Original material not covered by an existing license grant is proprietary:
+prior written permission from Kaan AKCAN is required for use, modification, or
+redistribution. A public repository is not a general permission to use its code.
+See [LICENSE](LICENSE).
+
+Third-party licenses and all prior grants remain unchanged. In particular,
+versions and portions already published through ChipLens Core under the
+[MIT License](https://github.com/kaanelectronicrun-lgtm/chiplens-core/blob/e2b9734a8d973281c66a22a5c98bdef718edac71/LICENSE) retain that permission.
+This notice does not retroactively make MIT-licensed code proprietary.
